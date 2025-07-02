@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>7SB1 Timetable</title>
   <style>
     body {
@@ -74,7 +74,8 @@
   </div>
 
   <script>
-    const apiUrl = 'https://your-backend-url.com/timetable'; // Replace with your deployed backend URL
+    // Leave empty for now or put backend URL when ready
+    const apiUrl = ''; 
 
     function showLogin() {
       document.getElementById('loginPrompt').style.display = 'block';
@@ -86,35 +87,89 @@
         document.getElementById('dashboard').style.display = 'block';
         document.getElementById('loginPrompt').style.display = 'none';
       } else {
-        alert('Wrong password.');
+        alert('Wrong password. Hint: It’s what Dora was always on.');
       }
     }
 
     async function loadSavedPeriods() {
+      if (!apiUrl) {
+        // fallback: load from localStorage
+        const data = JSON.parse(localStorage.getItem('timetableData')) || {};
+        updateDisplay(data);
+        updateEditFields(data);
+        return;
+      }
+
       try {
         const res = await fetch(apiUrl);
         const data = await res.json();
-        if (!data) return;
+        updateDisplay(data);
+        updateEditFields(data);
+      } catch (err) {
+        console.error('Failed to load timetable:', err);
+      }
+    }
 
-        if (data.school_day) {
-          document.getElementById('dateDisplay').textContent = `Date: ${data.school_day}`;
-          document.getElementById('editDate').value = data.school_day;
+    function updateDisplay(data) {
+      document.getElementById('dateDisplay').textContent = `Date: ${data.school_day || ''}`;
+      document.getElementById('p1').textContent = `Period 1: ${data.period1 || ''}`;
+      document.getElementById('p2').textContent = `Period 2: ${data.period2 || ''}`;
+      document.getElementById('p3').textContent = `Period 3: ${data.period3 || ''}`;
+      document.getElementById('p4').textContent = `Period 4: ${data.period4 || ''}`;
+      document.getElementById('p5').textContent = `Period 5: ${data.period5 || ''}`;
+    }
+
+    function updateEditFields(data) {
+      document.getElementById('editDate').value = data.school_day || '';
+      document.getElementById('editP1').value = data.period1 || '';
+      document.getElementById('editP2').value = data.period2 || '';
+      document.getElementById('editP3').value = data.period3 || '';
+      document.getElementById('editP4').value = data.period4 || '';
+      document.getElementById('editP5').value = data.period5 || '';
+    }
+
+    async function saveChanges() {
+      const body = {
+        school_day: document.getElementById('editDate').value,
+        period1: document.getElementById('editP1').value,
+        period2: document.getElementById('editP2').value,
+        period3: document.getElementById('editP3').value,
+        period4: document.getElementById('editP4').value,
+        period5: document.getElementById('editP5').value
+      };
+
+      if (!body.school_day) {
+        alert('Please select a date.');
+        return;
+      }
+
+      if (!apiUrl) {
+        // fallback: save to localStorage only
+        localStorage.setItem('timetableData', JSON.stringify(body));
+        alert('Saved locally (no backend URL set)');
+        updateDisplay(body);
+        return;
+      }
+
+      try {
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        if (res.ok) {
+          alert('Timetable saved!');
+          loadSavedPeriods();
+        } else {
+          alert('Error saving timetable');
         }
-        if (data.period1) {
-          document.getElementById('p1').textContent = `Period 1: ${data.period1}`;
-          document.getElementById('editP1').value = data.period1;
-        }
-        if (data.period2) {
-          document.getElementById('p2').textContent = `Period 2: ${data.period2}`;
-          document.getElementById('editP2').value = data.period2;
-        }
-        if (data.period3) {
-          document.getElementById('p3').textContent = `Period 3: ${data.period3}`;
-          document.getElementById('editP3').value = data.period3;
-        }
-        if (data.period4) {
-          document.getElementById('p4').textContent = `Period 4: ${data.period4}`;
-          document.getElementById('editP4').value = data.period4;
-        }
-        if (data.period5) {
-          document.getElementById('p5').textContent = `
+      } catch (err) {
+        console.error('Save failed:', err);
+      }
+    }
+
+    window.onload = loadSavedPeriods;
+  </script>
+</body>
+</html>
