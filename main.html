@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>7SB1 Timetable</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+      padding: 20px;
+    }
+    #dashboard, #loginPrompt {
+      display: none;
+    }
+    .period {
+      background: white;
+      padding: 10px;
+      margin: 10px auto;
+      max-width: 300px;
+      border-radius: 10px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    }
+    input[type="text"] {
+      width: 90%;
+      padding: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>7SB1 Timetable</h1>
+  <div id="timetable">
+    <div class="period" id="p1">Period 1: Maths</div>
+    <div class="period" id="p2">Period 2: English</div>
+    <div class="period">Break</div>
+    <div class="period" id="p3">Period 3: Science</div>
+    <div class="period" id="p4">Period 4: History</div>
+    <div class="period">Lunch</div>
+    <div class="period" id="p5">Period 5: PE</div>
+    <div class="period">Going Home Time</div>
+  </div>
+  
+  <button onclick="showLogin()">Login</button>
+  
+  <div id="loginPrompt">
+    <input type="password" id="passwordInput" placeholder="Enter password">
+    <button onclick="attemptLogin()">Submit</button>
+  </div>
+
+  <div id="dashboard">
+    <h2>Edit Periods</h2>
+    <div>
+      <input type="text" id="editP1" placeholder="Period 1">
+      <input type="text" id="editP2" placeholder="Period 2">
+      <input type="text" id="editP3" placeholder="Period 3">
+      <input type="text" id="editP4" placeholder="Period 4">
+      <input type="text" id="editP5" placeholder="Period 5">
+      <button onclick="saveChanges()">Save</button>
+    </div>
+  </div>
+
+  <script>
+    function showLogin() {
+      document.getElementById('loginPrompt').style.display = 'block';
+    }
+
+    function attemptLogin() {
+      const password = document.getElementById('passwordInput').value;
+      if (password === 'theventure') {
+        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('loginPrompt').style.display = 'none';
+      } else {
+        alert('Wrong password. Hint: It’s what Dora was always on.');
+      }
+    }
+
+    function saveChanges() {
+      const p1 = document.getElementById('editP1').value;
+      const p2 = document.getElementById('editP2').value;
+      const p3 = document.getElementById('editP3').value;
+      const p4 = document.getElementById('editP4').value;
+      const p5 = document.getElementById('editP5').value;
+
+      if (p1) {
+        document.getElementById('p1').textContent = `Period 1: ${p1}`;
+        localStorage.setItem('p1', p1);
+      }
+      if (p2) {
+        document.getElementById('p2').textContent = `Period 2: ${p2}`;
+        localStorage.setItem('p2', p2);
+      }
+      if (p3) {
+        document.getElementById('p3').textContent = `Period 3: ${p3}`;
+        localStorage.setItem('p3', p3);
+      }
+      if (p4) {
+        document.getElementById('p4').textContent = `Period 4: ${p4}`;
+        localStorage.setItem('p4', p4);
+      }
+      if (p5) {
+        document.getElementById('p5').textContent = `Period 5: ${p5}`;
+        localStorage.setItem('p5', p5);
+      }
+    }
+
+    function loadSavedPeriods() {
+      const savedP1 = localStorage.getItem('p1');
+      const savedP2 = localStorage.getItem('p2');
+      const savedP3 = localStorage.getItem('p3');
+      const savedP4 = localStorage.getItem('p4');
+      const savedP5 = localStorage.getItem('p5');
+
+      if (savedP1) document.getElementById('p1').textContent = `Period 1: ${savedP1}`;
+      if (savedP2) document.getElementById('p2').textContent = `Period 2: ${savedP2}`;
+      if (savedP3) document.getElementById('p3').textContent = `Period 3: ${savedP3}`;
+      if (savedP4) document.getElementById('p4').textContent = `Period 4: ${savedP4}`;
+      if (savedP5) document.getElementById('p5').textContent = `Period 5: ${savedP5}`;
+    }
+
+    window.onload = loadSavedPeriods;
+  </script>
+</body>
+</html>
