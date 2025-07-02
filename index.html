@@ -74,8 +74,7 @@
   </div>
 
   <script>
-    // Leave empty for now or put backend URL when ready
-    const apiUrl = ''; 
+    const apiUrl = 'http://localhost:3000/timetable'; // Change this if hosted somewhere else
 
     function showLogin() {
       document.getElementById('loginPrompt').style.display = 'block';
@@ -92,21 +91,15 @@
     }
 
     async function loadSavedPeriods() {
-      if (!apiUrl) {
-        // fallback: load from localStorage
-        const data = JSON.parse(localStorage.getItem('timetableData')) || {};
-        updateDisplay(data);
-        updateEditFields(data);
-        return;
-      }
-
       try {
         const res = await fetch(apiUrl);
+        if (!res.ok) throw new Error('Failed to fetch timetable');
         const data = await res.json();
         updateDisplay(data);
         updateEditFields(data);
       } catch (err) {
-        console.error('Failed to load timetable:', err);
+        console.error(err);
+        alert('Failed to load timetable data.');
       }
     }
 
@@ -135,7 +128,7 @@
         period2: document.getElementById('editP2').value,
         period3: document.getElementById('editP3').value,
         period4: document.getElementById('editP4').value,
-        period5: document.getElementById('editP5').value
+        period5: document.getElementById('editP5').value,
       };
 
       if (!body.school_day) {
@@ -143,29 +136,18 @@
         return;
       }
 
-      if (!apiUrl) {
-        // fallback: save to localStorage only
-        localStorage.setItem('timetableData', JSON.stringify(body));
-        alert('Saved locally (no backend URL set)');
-        updateDisplay(body);
-        return;
-      }
-
       try {
         const res = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
+          body: JSON.stringify(body),
         });
-
-        if (res.ok) {
-          alert('Timetable saved!');
-          loadSavedPeriods();
-        } else {
-          alert('Error saving timetable');
-        }
+        if (!res.ok) throw new Error('Failed to save timetable');
+        alert('Timetable saved!');
+        loadSavedPeriods();
       } catch (err) {
-        console.error('Save failed:', err);
+        console.error(err);
+        alert('Error saving timetable.');
       }
     }
 
