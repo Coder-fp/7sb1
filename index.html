@@ -22,9 +22,10 @@
       border-radius: 10px;
       box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
     }
-    input[type="text"] {
+    input[type="text"], input[type="date"] {
       width: 90%;
       padding: 5px;
+      margin: 5px 0;
     }
     button {
       padding: 10px 20px;
@@ -43,36 +44,38 @@
 <body>
   <h1>7SB1 Timetable</h1>
   <div id="timetable">
-    <div class="period" id="p1">Period 1: Maths</div>
-    <div class="period" id="p2">Period 2: English</div>
+    <div id="dateDisplay" class="period">Date: </div>
+    <div class="period" id="p1">Period 1: Loading...</div>
+    <div class="period" id="p2">Period 2: Loading...</div>
     <div class="period">Break</div>
-    <div class="period" id="p3">Period 3: Science</div>
-    <div class="period" id="p4">Period 4: History</div>
+    <div class="period" id="p3">Period 3: Loading...</div>
+    <div class="period" id="p4">Period 4: Loading...</div>
     <div class="period">Lunch</div>
-    <div class="period" id="p5">Period 5: PE</div>
+    <div class="period" id="p5">Period 5: Loading...</div>
     <div class="period">Going Home Time</div>
   </div>
-  
+
   <button onclick="showLogin()">Login</button>
-  
+
   <div id="loginPrompt">
-    <input type="password" id="passwordInput" placeholder="Enter password">
+    <input type="password" id="passwordInput" placeholder="Enter password" />
     <button onclick="attemptLogin()">Submit</button>
   </div>
 
   <div id="dashboard">
     <h2>Edit Periods</h2>
-    <div>
-      <input type="text" id="editP1" placeholder="Period 1">
-      <input type="text" id="editP2" placeholder="Period 2">
-      <input type="text" id="editP3" placeholder="Period 3">
-      <input type="text" id="editP4" placeholder="Period 4">
-      <input type="text" id="editP5" placeholder="Period 5">
-      <button onclick="saveChanges()">Save</button>
-    </div>
+    <input type="date" id="editDate" />
+    <input type="text" id="editP1" placeholder="Period 1" />
+    <input type="text" id="editP2" placeholder="Period 2" />
+    <input type="text" id="editP3" placeholder="Period 3" />
+    <input type="text" id="editP4" placeholder="Period 4" />
+    <input type="text" id="editP5" placeholder="Period 5" />
+    <button onclick="saveChanges()">Save</button>
   </div>
 
   <script>
+    const apiUrl = 'https://your-backend-url.com/timetable'; // Replace with your deployed backend URL
+
     function showLogin() {
       document.getElementById('loginPrompt').style.display = 'block';
     }
@@ -83,54 +86,35 @@
         document.getElementById('dashboard').style.display = 'block';
         document.getElementById('loginPrompt').style.display = 'none';
       } else {
-        alert('Wrong password. Hint: It’s what Dora was always on.');
+        alert('Wrong password.');
       }
     }
 
-    function saveChanges() {
-      const p1 = document.getElementById('editP1').value;
-      const p2 = document.getElementById('editP2').value;
-      const p3 = document.getElementById('editP3').value;
-      const p4 = document.getElementById('editP4').value;
-      const p5 = document.getElementById('editP5').value;
+    async function loadSavedPeriods() {
+      try {
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+        if (!data) return;
 
-      if (p1) {
-        document.getElementById('p1').textContent = `Period 1: ${p1}`;
-        localStorage.setItem('p1', p1);
-      }
-      if (p2) {
-        document.getElementById('p2').textContent = `Period 2: ${p2}`;
-        localStorage.setItem('p2', p2);
-      }
-      if (p3) {
-        document.getElementById('p3').textContent = `Period 3: ${p3}`;
-        localStorage.setItem('p3', p3);
-      }
-      if (p4) {
-        document.getElementById('p4').textContent = `Period 4: ${p4}`;
-        localStorage.setItem('p4', p4);
-      }
-      if (p5) {
-        document.getElementById('p5').textContent = `Period 5: ${p5}`;
-        localStorage.setItem('p5', p5);
-      }
-    }
-
-    function loadSavedPeriods() {
-      const savedP1 = localStorage.getItem('p1');
-      const savedP2 = localStorage.getItem('p2');
-      const savedP3 = localStorage.getItem('p3');
-      const savedP4 = localStorage.getItem('p4');
-      const savedP5 = localStorage.getItem('p5');
-
-      if (savedP1) document.getElementById('p1').textContent = `Period 1: ${savedP1}`;
-      if (savedP2) document.getElementById('p2').textContent = `Period 2: ${savedP2}`;
-      if (savedP3) document.getElementById('p3').textContent = `Period 3: ${savedP3}`;
-      if (savedP4) document.getElementById('p4').textContent = `Period 4: ${savedP4}`;
-      if (savedP5) document.getElementById('p5').textContent = `Period 5: ${savedP5}`;
-    }
-
-    window.onload = loadSavedPeriods;
-  </script>
-</body>
-</html>
+        if (data.school_day) {
+          document.getElementById('dateDisplay').textContent = `Date: ${data.school_day}`;
+          document.getElementById('editDate').value = data.school_day;
+        }
+        if (data.period1) {
+          document.getElementById('p1').textContent = `Period 1: ${data.period1}`;
+          document.getElementById('editP1').value = data.period1;
+        }
+        if (data.period2) {
+          document.getElementById('p2').textContent = `Period 2: ${data.period2}`;
+          document.getElementById('editP2').value = data.period2;
+        }
+        if (data.period3) {
+          document.getElementById('p3').textContent = `Period 3: ${data.period3}`;
+          document.getElementById('editP3').value = data.period3;
+        }
+        if (data.period4) {
+          document.getElementById('p4').textContent = `Period 4: ${data.period4}`;
+          document.getElementById('editP4').value = data.period4;
+        }
+        if (data.period5) {
+          document.getElementById('p5').textContent = `
